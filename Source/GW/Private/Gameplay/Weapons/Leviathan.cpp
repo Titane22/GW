@@ -254,7 +254,7 @@ void ALeviathan::ReturnAxe()
 	// 도끼의 현재 위치에서 캐릭터의 도끼 소켓 위치까지의 벡터를 계산
 	FVector DirectionToCharacter = GetActorLocation() - PlayerRef->GetMesh()->GetSocketLocation(FName("AxeSocket"));
 
-	DistanceFromChar = FMath::Clamp(DirectionToCharacter.Length(), 0.f, MaxCalculationDistance);
+	DistanceFromChar = FMath::Clamp(DirectionToCharacter.Size(), 0.f, MaxCalculationDistance);
 	AdjustAxeReturnLocation();
 
 	InitialLocation = GetActorLocation();
@@ -269,8 +269,8 @@ void ALeviathan::ReturnAxe()
 
 	if (!ReturnNoBrownNoiseSound)
 		return;
-	
-	float TimelineLength = 1.f/NewRate;
+
+	float TimelineLength = 1.f / NewRate;
 
 	FTimerHandle TimerHandle;
 	if (TimelineLength - 0.87f > 0.f)
@@ -284,35 +284,49 @@ void ALeviathan::ReturnAxe()
 					SkeletalMesh
 				);
 			},
-			TimelineLength,
+			TimelineLength - 0.87f,
 			false
 		);
 	}
 	else
 	{
 		float StartTimeLength = 0.87f - TimelineLength;
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("StartTimeLength: %lf"), StartTimeLength));
+		UE_LOG(LogTemp, Warning, TEXT("Start Time Length: %lf"), StartTimeLength);
 		if (UAudioComponent* AudioComp = UGameplayStatics::SpawnSoundAttached(
 			ReturnNoBrownNoiseSound,
 			SkeletalMesh,
 			NAME_None,
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset,
+			EAttachLocation::SnapToTargetIncludingScale,
 			true,
+			1.f,
 			1.f,
 			StartTimeLength
 		))
 		{
 			AudioComp->FadeIn(0.1f, 1.f, StartTimeLength);
 		}
+		
 	}
+
+	StopAxeRotation();
+
+	NumOfSpins = FMath::RoundToInt32(TimelineLength / ReturnSpinRate);
+	float SpinLength = (TimelineLength - 0.055f) / (float)NumOfSpins;
+
+	SpinTimeline->SetPlayRate(1.f / SpinLength);
+	SpinTimeline->PlayFromStart();
+
+	AxeLocationLastTick = ReturnTargetLocation;
+	AxeTraceReturnTimeline->PlayFromStart();
 }
 
 void ALeviathan::UpdateAxeRotation(float Value)
 {
 	float CurrentTime = AxeRotTimeline->GetPlaybackPosition();
 	float RotationValue = AxeRotCurve ? AxeRotCurve->GetFloatValue(CurrentTime) : 0.f;
-	bool bShouldTrigger = false;
 
 	if (SkeletalMesh)
 	{
@@ -467,7 +481,6 @@ void ALeviathan::UpdateAxeReturn(float Value)
 	FRotator NewRotation = UKismetMathLibrary::RLerp(LerpedRotation, PlayerRef->GetMesh()->GetSocketRotation(FName("AxeSocket")), Rotation2Value, true);
 
 	SetActorLocationAndRotation(ReturnTargetLocation, NewRotation);
-
 	if (ReturnWhoosh)
 		ReturnWhoosh->SetVolumeMultiplier(SoundValue);
 }
@@ -628,6 +641,9 @@ void ALeviathan::Recall()
 		WiggleTimeline->PlayFromStart();
 		break;
 	}
+
+	if (ThrowParticle)
+		ThrowParticle->BeginTrails(FName("BaseSocket"), FName("TipSocket"), ETrailWidthMode_FromCentre, 1.f);
 	ReturnAxe();
 }
 
