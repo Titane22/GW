@@ -291,8 +291,6 @@ void ALeviathan::ReturnAxe()
 	else
 	{
 		float StartTimeLength = 0.87f - TimelineLength;
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("StartTimeLength: %lf"), StartTimeLength));
-		UE_LOG(LogTemp, Warning, TEXT("Start Time Length: %lf"), StartTimeLength);
 		if (UAudioComponent* AudioComp = UGameplayStatics::SpawnSoundAttached(
 			ReturnNoBrownNoiseSound,
 			SkeletalMesh,
@@ -362,14 +360,14 @@ void ALeviathan::UpdateAxeThrowTrace(float Value)
 	const FColor HitColor = FColor::Green;
 	const float DrawTime = 12.f;
 
-	DrawDebugLine(
-		GetWorld(),
-		StartLocation,
-		EndLocation,
-		bHit ? HitColor : TraceColor,
-		false,
-		DrawTime
-	);
+	// DrawDebugLine(
+	// 	GetWorld(),
+	// 	StartLocation,
+	// 	EndLocation,
+	// 	bHit ? HitColor : TraceColor,
+	// 	false,
+	// 	DrawTime
+	// );
 
 	if (bHit)
 	{
@@ -550,7 +548,7 @@ void ALeviathan::UpdateAxeTraceReturn(float Value)
 		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
 		false,
 		TArray<AActor*>(),
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		HitResult,
 		true
 	);
@@ -635,16 +633,16 @@ void ALeviathan::Recall()
 	{
 	case EAxeState::Launched:
 		ZAdjustment = 10.f;
+		
+		if (ThrowParticle)
+			ThrowParticle->BeginTrails(FName("BaseSocket"), FName("TipSocket"), ETrailWidthMode_FromCentre, 1.f);
+		ReturnAxe();
 		break;
 	case EAxeState::LodgedInSomething:
 		LodgePointBaseRotation = LodgePoint->GetRelativeRotation();
 		WiggleTimeline->PlayFromStart();
 		break;
 	}
-
-	if (ThrowParticle)
-		ThrowParticle->BeginTrails(FName("BaseSocket"), FName("TipSocket"), ETrailWidthMode_FromCentre, 1.f);
-	ReturnAxe();
 }
 
 void ALeviathan::SnapAxeToStartPosition(FRotator StartRotation, FVector ThrowDirectionVector, FVector CameraLocation)

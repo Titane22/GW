@@ -46,7 +46,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components")
 	USceneComponent* DefaultSceneRoot;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Particle")
 	UParticleSystemComponent* AxeCatchParticle;
 
