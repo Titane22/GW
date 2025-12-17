@@ -8,6 +8,7 @@
 #include "Variant_Combat/Interfaces/CombatDamageable.h"
 #include "Player_Base.generated.h"
 
+class UHealthComponent;
 class ALeviathan;
 class UTimelineComponent;
 class UCurveFloat;
@@ -72,6 +73,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bUserControllerRotation;
 
@@ -165,10 +169,10 @@ protected:
 	USoundBase* ThrowEffortSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Axe Throw", meta = (AllowPrivateAccess = "true"))
-	float SpringArmLengthIdle = 120.0f;
+	float SpringArmLengthIdle = 150.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Axe Throw", meta = (AllowPrivateAccess = "true"))
-	float SpringArmLengthAim = 100.0f;
+	float SpringArmLengthAim = 120.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Axe Throw", meta = (AllowPrivateAccess = "true"))
 	FVector CameraVector = FVector(20.0f, 50.0f, 60.0f);

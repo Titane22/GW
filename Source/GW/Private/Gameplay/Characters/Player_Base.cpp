@@ -13,6 +13,7 @@
 #include "Gameplay/Weapons/Leviathan.h"
 #include "Gameplay/Components/PlayerProgressionComponent.h"
 #include "Gameplay/Components/CombatComponent.h"
+#include "Gameplay/Components/HealthComponent.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -26,7 +27,7 @@ APlayer_Base::APlayer_Base()
 	bUseControllerRotationRoll = false;
 
 	// Configure camera boom (God of War style - close over-the-shoulder)
-	CameraBoom->TargetArmLength = 120.0f;
+	CameraBoom->TargetArmLength = 100.0f;
 	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->SocketOffset = FVector(20.0f, 50.0f, 60.0f);
 	CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f));
@@ -58,6 +59,7 @@ APlayer_Base::APlayer_Base()
 	// 스킬 시스템 컴포넌트 생성
 	ProgressionComponent = CreateDefaultSubobject<UPlayerProgressionComponent>(TEXT("ProgressionComponent"));
 	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
 void APlayer_Base::BeginPlay()
@@ -365,19 +367,33 @@ void APlayer_Base::CheckChargedAttack()
 
 void APlayer_Base::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
 {
-	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	if (HealthComponent)
+	{
+		HealthComponent->ApplayDamage(
+			Damage,
+			DamageCauser,
+			DamageLocation,
+			DamageImpulse
+		);
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Player received %.1f damage from %s"),
 		Damage, DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
 }
 
 void APlayer_Base::HandleDeath()
 {
-	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	if (HealthComponent)
+	{
+		HealthComponent->Death();
+	}
 	UE_LOG(LogTemp, Warning, TEXT("Player died!"));
 }
 
 void APlayer_Base::ApplyHealing(float Healing, AActor* Healer)
 {
-	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	if (HealthComponent)
+	{
+		HealthComponent->ApplyHealing(Healing, Healer);
+	}
 	UE_LOG(LogTemp, Log, TEXT("Player healed %.1f"), Healing);
 }
