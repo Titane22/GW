@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GWCharacter.h"
+#include "Variant_Combat/Interfaces/CombatAttacker.h"
+#include "Variant_Combat/Interfaces/CombatDamageable.h"
 #include "Player_Base.generated.h"
 
 class ALeviathan;
 class UTimelineComponent;
 class UCurveFloat;
+class UPlayerProgressionComponent;
+class UCombatComponent;
 /**
  * 
  */
 UCLASS()
-class GW_API APlayer_Base : public AGWCharacter
+class GW_API APlayer_Base : public AGWCharacter, public ICombatDamageable, public ICombatAttacker
 {
 	GENERATED_BODY()
 
@@ -60,6 +64,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapons", meta = (AllowPrivateAccess = "true"))
 	UCapsuleComponent* AxeCollision;
 
+	// 스킬 진행도 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UPlayerProgressionComponent* ProgressionComponent;
+
+	// 전투 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UCombatComponent* CombatComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bUserControllerRotation;
 
@@ -77,6 +89,21 @@ public:
 
 	void Catch();
 	
+	UFUNCTION()
+	ALeviathan* GetLeviathanAxe() const { return LeviathanRef; }
+
+	// ========== ICombatAttacker 인터페이스 구현 ==========
+
+	virtual void DoAttackTrace(FName DamageSourceBone) override;
+	virtual void CheckCombo() override;
+	virtual void CheckChargedAttack() override;
+
+	// ========== ICombatDamageable 인터페이스 구현 ==========
+
+	virtual void ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse) override;
+	virtual void HandleDeath() override;
+	virtual void ApplyHealing(float Healing, AActor* Healer) override;
+
 protected:
 	/** Initialize input action bindings */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -111,7 +138,7 @@ protected:
 
 	UFUNCTION()
 	void LerpCameraPosition(float Value);
-
+	
 protected:
 	ALeviathan* LeviathanRef = nullptr;
 

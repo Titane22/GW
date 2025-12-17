@@ -11,6 +11,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Gameplay/Weapons/Leviathan.h"
+#include "Gameplay/Components/PlayerProgressionComponent.h"
+#include "Gameplay/Components/CombatComponent.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -52,6 +54,10 @@ APlayer_Base::APlayer_Base()
 	AimTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("AimTimeline"));
 	DesiredSocketTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DesiredSocketTimeline"));
 	RangedCameraTl = CreateDefaultSubobject<UTimelineComponent>(TEXT("RangedCameraTl"));
+
+	// 스킬 시스템 컴포넌트 생성
+	ProgressionComponent = CreateDefaultSubobject<UPlayerProgressionComponent>(TEXT("ProgressionComponent"));
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
 
 void APlayer_Base::BeginPlay()
@@ -165,6 +171,13 @@ void APlayer_Base::PerformAttack()
 	if (bIsAim)
 	{
 		ThrowAxe();
+	}
+	else
+	{
+		if (CombatComponent)
+		{
+			CombatComponent->PerformAttack();
+		}
 	}
 }
 
@@ -320,4 +333,51 @@ void APlayer_Base::OnCatchNotifyEnd(FName NotifyName, const FBranchingPointNotif
 	{
 		AnimInstance->Montage_SetPlayRate(AnimInstance->GetCurrentActiveMontage(), 1.f);
 	}
+}
+
+// ========== ICombatAttacker 인터페이스 구현 ==========
+
+void APlayer_Base::DoAttackTrace(FName DamageSourceBone)
+{
+	if (CombatComponent)
+	{
+		CombatComponent->PerformAttackTrace(DamageSourceBone);
+	}
+}
+
+void APlayer_Base::CheckCombo()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->CheckComboInput();
+	}
+}
+
+void APlayer_Base::CheckChargedAttack()
+{
+	if (CombatComponent)
+	{
+		CombatComponent->HandleChargedAttack();
+	}
+}
+
+// ========== ICombatDamageable 인터페이스 구현 ==========
+
+void APlayer_Base::ApplyDamage(float Damage, AActor* DamageCauser, const FVector& DamageLocation, const FVector& DamageImpulse)
+{
+	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	UE_LOG(LogTemp, Warning, TEXT("Player received %.1f damage from %s"),
+		Damage, DamageCauser ? *DamageCauser->GetName() : TEXT("Unknown"));
+}
+
+void APlayer_Base::HandleDeath()
+{
+	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	UE_LOG(LogTemp, Warning, TEXT("Player died!"));
+}
+
+void APlayer_Base::ApplyHealing(float Healing, AActor* Healer)
+{
+	// TODO: HealthComponent 생성 시 해당 컴포넌트로 위임
+	UE_LOG(LogTemp, Log, TEXT("Player healed %.1f"), Healing);
 }

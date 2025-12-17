@@ -278,4 +278,7 @@ public:
 	void SnapAxeToStartPosition(FRotator StartRotation, FVector ThrowDirectionVector, FVector CameraLocation);
 
 	void SetAxeState(int32 Index);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Axe")
+	EAxeState GetAxeState() const { return AxeState; }
 };
