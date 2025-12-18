@@ -88,8 +88,8 @@ void APlayer_Base::BeginPlay()
 
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayer_Base::OnNotifyBegin);
-		AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &APlayer_Base::OnNotifyEnd);
+		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayer_Base::OnThrowNotifyBegin);
+		AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &APlayer_Base::OnThrowNotifyEnd);
 		AnimInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &APlayer_Base::OnCatchNotifyBegin);
 		AnimInstance->OnPlayMontageNotifyEnd.AddDynamic(this, &APlayer_Base::OnCatchNotifyEnd);
 	}
@@ -292,7 +292,7 @@ void APlayer_Base::Catch()
 	}
 }
 
-void APlayer_Base::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+void APlayer_Base::OnThrowNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
 	if (NotifyName != FName("Throw") || !ThrowEffortSound)
 		return;
@@ -303,7 +303,7 @@ void APlayer_Base::OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPa
 	);
 }
 
-void APlayer_Base::OnNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+void APlayer_Base::OnThrowNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
 {
 	if (NotifyName != FName("Throw"))
 		return;

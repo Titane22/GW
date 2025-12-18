@@ -43,7 +43,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Combat|Combo")
 	TArray<FName> ComboSectionNames;
-
 	
 	bool bIsAttacking;
 	
@@ -87,6 +86,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float ComboResetTime;
 
+	UPROPERTY(EditAnywhere, Category="Combat|Damage", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm/s"))
+	float MeleeKnockbackImpulse = 250.0f;
+	
+	UPROPERTY(EditAnywhere, Category="Combat|Damage", meta = (ClampMin = 0, ClampMax = 1000, Units = "cm/s"))
+	float MeleeLaunchImpulse = 300.0f;
+	
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Combat")
 	FOnComboExecuted OnComboExecuted;

@@ -257,7 +257,7 @@ void UCombatComponent::PerformAttackTrace(FName DamageSourceBone)
 
 				// 넉백 임펄스 계산
 				FVector ImpulseDirection = (Hit.ImpactPoint - Origin).GetSafeNormal();
-				FVector Impulse = ImpulseDirection * 1000.f;  // 넉백 강도
+				FVector Impulse = (Hit.ImpactNormal * -MeleeKnockbackImpulse) + (FVector::UpVector * MeleeLaunchImpulse);
 
 				// 데미지 적용
 				ICombatDamageable* DamageableActor = Cast<ICombatDamageable>(HitActor);

@@ -125,10 +125,10 @@ protected:
 	void ReturnAxe();
 
 	UFUNCTION()
-	void OnNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+	void OnThrowNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 	UFUNCTION()
-	void OnNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
+	void OnThrowNotifyEnd(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 	UFUNCTION()
 	void OnCatchNotifyBegin(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointPayload);
