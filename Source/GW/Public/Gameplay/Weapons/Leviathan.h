@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Leviathan.generated.h"
 
+class AEnemy_Base;
 class UProjectileMovementComponent;
 class UTimelineComponent;
 class APlayer_Base;
@@ -140,6 +141,9 @@ protected:
 
 	EPhysicalSurface HitSurface;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Axe|Damage")
+	float ThrowingDamage = 10.5f;
+
 	float AxeSpinRate = 2.5f;
 
 	float AxeThrowTraceDistance= 60.f;
@@ -154,8 +158,8 @@ protected:
 
 	EAxeState AxeState = EAxeState::Idle;
 
-	// TODO: Change Enemy Actor
-	ACharacter* HitEnemyRef;
+	// Change Enemy Actor
+	AEnemy_Base* HitEnemyRef;
 
 	APlayer_Base* PlayerRef;
 

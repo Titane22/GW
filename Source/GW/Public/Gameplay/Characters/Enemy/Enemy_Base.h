@@ -8,12 +8,12 @@
 #include "GWCharacter.h"
 #include "Enemy_Base.generated.h"
 
-class UHealthComponent;
 class UWidgetComponent;
 class UUserWidget;
+class AHealOrb;
 
 /**
- *
+ * Enemy base class with 3D widget health bar
  */
 UCLASS()
 class GW_API AEnemy_Base : public AGWCharacter, public ICombatDamageable, public ICombatAttacker
@@ -24,9 +24,6 @@ public:
 	AEnemy_Base();
 
 protected:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UHealthComponent* HealthComponent;
 
 	/** Health bar widget component displayed above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -40,16 +37,27 @@ protected:
 	UPROPERTY()
 	UUserWidget* HealthWidget;
 
+	/** Heal orb class to spawn on death */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot")
+	TSubclassOf<AHealOrb> HealOrbClass;
+
+	/** Number of heal orbs to spawn on death */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loot")
+	int32 HealOrbCount = 3;
+
+	/** Time before destroying actor after death */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Death")
+	float DeathRemovalTime = 5.0f;
+
+	/** Death timer handle */
+	FTimerHandle DeathTimerHandle;
+
 protected:
 
 	virtual void BeginPlay() override;
 
-	/** Updates the health bar widget to reflect current health */
-	void UpdateHealthBar();
-
-	/** Blueprint event to update health bar UI - Implement this in Blueprint */
-	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
-	void OnHealthChanged(float HealthPercent);
+	/** Destroys the actor after death timer */
+	void RemoveFromWorld();
 
 public:
 

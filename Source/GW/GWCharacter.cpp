@@ -11,11 +11,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GW.h"
+#include "Gameplay/Components/HealthComponent.h"
 
 AGWCharacter::AGWCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	// Create health component
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 		
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -130,4 +134,18 @@ void AGWCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AGWCharacter::UpdateHealthBar()
+{
+	if (!HealthComponent)
+		return;
+
+	float HealthPercent = HealthComponent->GetCurrentHealth() / HealthComponent->GetMaxHealth();
+	OnHealthChanged(HealthPercent);
+}
+
+UHealthComponent* AGWCharacter::GetHealthComponent() const
+{
+	return HealthComponent;
 }

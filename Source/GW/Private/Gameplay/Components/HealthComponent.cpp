@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Gameplay/Components/HealthComponent.h"
 #include "GWCharacter.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Variant_Combat/Interfaces/CombatDamageable.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -111,11 +111,21 @@ void UHealthComponent::Death()
 		UE_LOG(LogTemp, Warning, TEXT("OwnerRef is Not Founded!"));
 		return;
 	}
-	// disable movement while we're dead
-	OwnerRef->GetCharacterMovement()->DisableMovement();
 
-	// enable full ragdoll physics
-	OwnerRef->GetMesh()->SetSimulatePhysics(true);
+	// Call HandleDeath on ICombatDamageable interface
+	if (ICombatDamageable* DamageableOwner = Cast<ICombatDamageable>(OwnerRef))
+	{
+		DamageableOwner->HandleDeath();
+	}
+	else
+	{
+		// Fallback: default death behavior
+		// disable movement while we're dead
+		OwnerRef->GetCharacterMovement()->DisableMovement();
+
+		// enable full ragdoll physics
+		OwnerRef->GetMesh()->SetSimulatePhysics(true);
+	}
 }
 
 void UHealthComponent::ApplyHealing(float HealAmount, AActor* Healer)

@@ -8,6 +8,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Gameplay/Characters/Player_Base.h"
+#include "Gameplay/Characters/Enemy/Enemy_Base.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -384,8 +385,7 @@ void ALeviathan::UpdateAxeThrowTrace(float Value)
 
 		StopAxeThrowTrace();
 		ProjectileMovement->Deactivate();
-		// TODO: Enemy
-		if (ACharacter* CharacterRef = Cast<ACharacter>(Hit.GetActor()))
+		if (AEnemy_Base* CharacterRef = Cast<AEnemy_Base>(Hit.GetActor()))
 		{
 			HitEnemyRef = CharacterRef;
 			LodgeAxe();
@@ -395,7 +395,7 @@ void ALeviathan::UpdateAxeThrowTrace(float Value)
 			FVector NormalizedDirection = DirectionVector.GetSafeNormal(0.0001f);
 			FVector ImpactVector = NormalizedDirection * ImpulseStrength;
 
-			// TODO: HitEnemyRef->ReceiveHit(true, HitBoneName, ImpactVector);
+			HitEnemyRef->ApplyDamage(ThrowingDamage, this, ImpactLocation, ImpactVector);
 			FAttachmentTransformRules AttachRules(
 				EAttachmentRule::KeepWorld,
 				EAttachmentRule::KeepWorld,
@@ -560,6 +560,29 @@ void ALeviathan::UpdateAxeTraceReturn(float Value)
 		ImpactLocation = HitResult.ImpactPoint;
 		// TODO: Destructible
 		// TODO: Enemy Damage
+		if (AEnemy_Base* CharacterRef = Cast<AEnemy_Base>(HitResult.GetActor()))
+		{
+			HitEnemyRef = CharacterRef;
+			LodgeAxe();
+
+			FVector TargetLocation = CharacterRef->GetActorLocation();
+			FVector DirectionVector = TargetLocation - CameraLocationAtThrow;
+			FVector NormalizedDirection = DirectionVector.GetSafeNormal(0.0001f);
+			FVector ImpactVector = NormalizedDirection * ImpulseStrength;
+
+			HitEnemyRef->ApplyDamage(ThrowingDamage, this, ImpactLocation, ImpactVector);
+			FAttachmentTransformRules AttachRules(
+				EAttachmentRule::KeepWorld,
+				EAttachmentRule::KeepWorld,
+				EAttachmentRule::KeepWorld,
+				false
+			);
+
+			AttachRules.bWeldSimulatedBodies = true;
+			this->AttachToComponent(HitEnemyRef->GetMesh(), AttachRules, HitBoneName);
+
+			// TODO: VFX
+		}
 	}
 }
 

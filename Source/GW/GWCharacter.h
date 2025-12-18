@@ -10,6 +10,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UHealthComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -31,6 +32,10 @@ protected:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
+	/** Health component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
+	UHealthComponent* HealthComponent;
 	
 	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -84,6 +89,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoJumpEnd();
 
+protected:
+
+	/** Updates the health bar - calls BlueprintImplementableEvent */
+	void UpdateHealthBar();
+
+	/** Blueprint event to update health bar UI - Implement this in Blueprint */
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void OnHealthChanged(float HealthPercent);
+
 public:
 
 	/** Returns CameraBoom subobject **/
@@ -91,5 +105,8 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/** Returns HealthComponent subobject **/
+	class UHealthComponent* GetHealthComponent() const;
 };
 

@@ -73,9 +73,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UHealthComponent* HealthComponent;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	bool bUserControllerRotation;
 

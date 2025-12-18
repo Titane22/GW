@@ -56,15 +56,18 @@ APlayer_Base::APlayer_Base()
 	DesiredSocketTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("DesiredSocketTimeline"));
 	RangedCameraTl = CreateDefaultSubobject<UTimelineComponent>(TEXT("RangedCameraTl"));
 
-	// 스킬 시스템 컴포넌트 생성
 	ProgressionComponent = CreateDefaultSubobject<UPlayerProgressionComponent>(TEXT("ProgressionComponent"));
-	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("PlayerCombatComp"));
 }
 
 void APlayer_Base::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 디버깅: 컴포넌트 생성 확인
+	UE_LOG(LogTemp, Warning, TEXT("CombatComponent: %s"), CombatComponent ? TEXT("Valid") : TEXT("NULL"));
+	UE_LOG(LogTemp, Warning, TEXT("ProgressionComponent: %s"), ProgressionComponent ? TEXT("Valid") : TEXT("NULL"));
+	UE_LOG(LogTemp, Warning, TEXT("HealthComponent: %s"), HealthComponent ? TEXT("Valid") : TEXT("NULL"));
 
 	GetMesh()->HideBoneByName(FName("hips_cloth_main_l"), EPhysBodyOp::PBO_None);
 	GetMesh()->HideBoneByName(FName("hips_cloth_main_r"), EPhysBodyOp::PBO_None);
@@ -79,11 +82,6 @@ void APlayer_Base::BeginPlay()
 	if (ALeviathan* Axe = Cast<ALeviathan>(LeviathanAxe->GetChildActor()))
 	{
 		LeviathanRef = Axe;
-		// if (UPrimitiveComponent* WeaponMesh = Cast<UPrimitiveComponent>(Axe->GetRootComponent()))
-		// {
-		// 	WeaponMesh->SetSimulatePhysics(false);
-		// 	WeaponMesh->SetEnableGravity(false);
-		// }
 	}
 
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
@@ -117,6 +115,11 @@ void APlayer_Base::BeginPlay()
 		FOnTimelineFloat TimelineProgress;
 		TimelineProgress.BindUFunction(this, FName("LerpCameraPosition"));
 		RangedCameraTl->AddInterpFloat(RangedCameraCurve, TimelineProgress);
+	}
+
+	if (HealthComponent)
+	{
+		UpdateHealthBar();
 	}
 }
 
