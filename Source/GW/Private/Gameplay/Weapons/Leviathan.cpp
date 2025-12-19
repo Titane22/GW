@@ -353,7 +353,7 @@ void ALeviathan::UpdateAxeThrowTrace(float Value)
 		Hit,
 		StartLocation,
 		EndLocation,
-		ECollisionChannel::ECC_Visibility,
+		ECollisionChannel::ECC_Pawn,
 		CollisionParams
 	);
 
@@ -545,7 +545,7 @@ void ALeviathan::UpdateAxeTraceReturn(float Value)
 		ReturnTargetLocation,
 		AxeLocationLastTick,
 		25.f,
-		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Visibility),
+		UEngineTypes::ConvertToTraceType(ECollisionChannel::ECC_Pawn),
 		false,
 		TArray<AActor*>(),
 		EDrawDebugTrace::None,

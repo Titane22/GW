@@ -148,7 +148,7 @@ protected:
 
 	float AxeThrowTraceDistance= 60.f;
 
-	float ImpulseStrength = 20000.f;
+	float ImpulseStrength = 2000.f;
 
 	float MaxCalculationDistance = 3000.f;
 
